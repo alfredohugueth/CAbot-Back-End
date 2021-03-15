@@ -48,7 +48,42 @@ async function sendToDialogFlow(msg, session, source, params) {
     
 }
 
+async function sendAudioToDialogflow(inputAudio, session){
+
+  let audioToDialogFlow = inputAudio;
+  try{
+
+    const sessionPath = sessionClient.projectAgentSessionPath(
+      config.GOOGLE_PROJECT_ID,
+      session
+    );
+
+    const request = {
+      session: sessionPath,
+      queryInput: {
+        audioConfig: {
+          audioEncoding: "AUDIO_ENCODING_LINEAR_16",
+          sampleRateHertz: 16000,
+          languageCode: "es",
+        },
+      },
+      inputAudio: inputAudio,
+    };
+
+    const result = await sessionClient.detectIntent(request);
+    //console.log(result);
+    return result
+    
+
+
+  }catch(err){
+    console.log(err);
+  }
+
+}
+
 module.exports = {
     sendToDialogFlow,
+    sendAudioToDialogflow
   };
   

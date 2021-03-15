@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const bodyParser = require("body-parser");
 var cors = require("cors");
+const fileUpload = require('express-fileupload');
 
 
 
@@ -18,13 +19,16 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-
+app.use(fileUpload({
+  createParentPath: true
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
+app.use(bodyParser.raw({ type: 'audio/wav', limit: '50mb' }));
 
 app.use('/', indexRouter);
 
@@ -33,14 +37,14 @@ app.use('/preguntas', questionRouter);
 
 app.use(
   bodyParser.json({
-    limit: "20mb",
+    limit: "30mb",
   })
 );
 // parse application/x-www-form-urlencoded
 app.use(
   bodyParser.urlencoded({
     extended: false,
-    limit: "20mb",
+    limit: "30mb",
   })
 );
 
