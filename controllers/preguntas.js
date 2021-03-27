@@ -188,9 +188,9 @@ exports.PreguntasRepetidasConRespuesta = async (req,res)=>{
     }],
     function (err, docs) {
     if (docs.length > 0) {
-      setTimeout(()=>{
+      
         res.json(docs); 
-      },1000)
+      
       
     } else {
       console.log("No hay datos en DB ");
