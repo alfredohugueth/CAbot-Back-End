@@ -1,15 +1,20 @@
 const dialogflow = require('@google-cloud/dialogflow');
-const config = require("./config");
+require('dotenv').config({path:'credentials.env'});
 
 const credentials = {
-  client_email: config.GOOGLE_CLIENT_EMAIL,
-  private_key: config.GOOGLE_PRIVATE_KEY,
+  client_email: process.env.CLIENT_EMAIL,
+  private_key: process.env.PRIVATE_KEY.replace(/\\n/gm, '\n'),
 };
+const PROJECT_ID = process.env.PROJECT_ID;
 // El keyFilename tiene que ser la ruta hacia tu cuenta de servicio generada.
 // The keyFilename have to be the path to your service account of google.
+
 const sessionClient = new dialogflow.SessionsClient({
-  keyFilename:"./public/javascripts/cata-bgij-8b3eb445ba46.json"
+  projectId:PROJECT_ID,
+  credentials,
 });
+
+
 
 /**
  * Send a query to the dialogflow agent, and return the query result.
@@ -20,7 +25,7 @@ async function sendToDialogFlow(msg, session, source, params) {
   sess = "123123"
   try {
     const sessionPath = sessionClient.projectAgentSessionPath(
-      config.GOOGLE_PROJECT_ID,
+      PROJECT_ID,
       session
     );
 
@@ -29,7 +34,7 @@ async function sendToDialogFlow(msg, session, source, params) {
       queryInput: {
         text: {
           text: textToDialogFlow,
-          languageCode: config.DF_LANGUAGE_CODE,
+          languageCode: process.env.DF_LANGUAGE_CODE,
         }
       },
       queryParams: {
@@ -40,6 +45,7 @@ async function sendToDialogFlow(msg, session, source, params) {
     };
       const responses = await sessionClient.detectIntent(request);
       const result = responses;
+      console.log(result)
       return result
     }catch(error){
         console.log(error);
@@ -54,7 +60,7 @@ async function sendAudioToDialogflow(inputAudio, session){
   try{
 
     const sessionPath = sessionClient.projectAgentSessionPath(
-      config.GOOGLE_PROJECT_ID,
+      PROJECT_ID,
       session
     );
 

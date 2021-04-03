@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('dotenv').config({path:'dbinfo.env'});
+require('dotenv').config({path:'credentials.env'});
 const conectarDB = async () =>{
     try{
         await mongoose.connect(process.env.DB_MONGO, {
