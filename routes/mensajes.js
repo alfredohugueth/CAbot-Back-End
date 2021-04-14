@@ -18,6 +18,8 @@ router.post('/audio',mensajes.PreguntaVozCliente);
 
 router.get('/preguntas-comunes',mensajes.PreguntasRepetidasConRespuesta);
 
+router.post('/more_questions',mensajes.QuieroPreguntarMas);
+
 
 
 

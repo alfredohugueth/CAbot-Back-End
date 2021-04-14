@@ -1,20 +1,18 @@
-const dialogflow = require('@google-cloud/dialogflow');
-require('dotenv').config({path:'credentials.env'});
+const dialogflow = require("@google-cloud/dialogflow");
+require("dotenv").config({ path: "credentials.env" });
 
 const credentials = {
   client_email: process.env.CLIENT_EMAIL,
-  private_key: process.env.PRIVATE_KEY.replace(/\\n/gm, '\n'),
+  private_key: process.env.PRIVATE_KEY.replace(/\\n/gm, "\n"),
 };
 const PROJECT_ID = process.env.PROJECT_ID;
 // El keyFilename tiene que ser la ruta hacia tu cuenta de servicio generada.
 // The keyFilename have to be the path to your service account of google.
 
 const sessionClient = new dialogflow.SessionsClient({
-  projectId:PROJECT_ID,
+  projectId: PROJECT_ID,
   credentials,
 });
-
-
 
 /**
  * Send a query to the dialogflow agent, and return the query result.
@@ -22,7 +20,7 @@ const sessionClient = new dialogflow.SessionsClient({
  */
 async function sendToDialogFlow(msg, session, source, params) {
   let textToDialogFlow = msg;
-  sess = "123123"
+  sess = "123123";
   try {
     const sessionPath = sessionClient.projectAgentSessionPath(
       PROJECT_ID,
@@ -35,30 +33,26 @@ async function sendToDialogFlow(msg, session, source, params) {
         text: {
           text: textToDialogFlow,
           languageCode: process.env.DF_LANGUAGE_CODE,
-        }
+        },
       },
       queryParams: {
         payload: {
           data: "params",
         },
-      }
+      },
     };
-      const responses = await sessionClient.detectIntent(request);
-      const result = responses;
-      console.log(result)
-      return result
-    }catch(error){
-        console.log(error);
-        
-    }
+    const responses = await sessionClient.detectIntent(request);
+    const result = responses;
     
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-async function sendAudioToDialogflow(inputAudio, session){
-
+async function sendAudioToDialogflow(inputAudio, session) {
   let audioToDialogFlow = inputAudio;
-  try{
-
+  try {
     const sessionPath = sessionClient.projectAgentSessionPath(
       PROJECT_ID,
       session
@@ -78,18 +72,13 @@ async function sendAudioToDialogflow(inputAudio, session){
 
     const result = await sessionClient.detectIntent(request);
     //console.log(result);
-    return result
-    
-
-
-  }catch(err){
+    return result;
+  } catch (err) {
     console.log(err);
   }
-
 }
 
 module.exports = {
-    sendToDialogFlow,
-    sendAudioToDialogflow
-  };
-  
+  sendToDialogFlow,
+  sendAudioToDialogflow,
+};
