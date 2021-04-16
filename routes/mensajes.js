@@ -21,6 +21,13 @@ router.get('/preguntas-comunes',mensajes.PreguntasRepetidasConRespuesta);
 router.post('/more_questions',mensajes.QuieroPreguntarMas);
 
 
+router.post('/gradebot',mensajes.calificarSi);
+
+router.post('/califica',mensajes.calificacion);
+
+router.post('/nocalifica',mensajes.noCalifica);
+
+
 
 
 

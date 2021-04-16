@@ -328,3 +328,109 @@ exports.QuieroPreguntarMas = async (req,res)=>{
   
 
 }
+
+
+exports.calificarSi = async (req,res) =>{
+  /* Recibimos deseo de calificacion y lo enviamos a dialogflow */
+
+  let msgUsuario = req.body.text;
+  
+  let userID = req.body.userID;
+  console.log(msgUsuario);
+  console.log(userID);
+  let respuesta = await dialogflow.sendToDialogFlow(
+    msgUsuario,
+    userID,
+    "Angular"
+  );
+  
+  /* En este caso no es necesario el proyectar esta respuesta en el html, por lo tanto, enviamos status*/
+  
+  res.json({texto:'Realiza la calificacion'});
+
+}
+
+
+exports.calificacion = async (req,res)=>{
+  /* Recibimos calificacion del usuario */
+
+  let msgUsuario = req.body.text;
+  
+  let userID = req.body.userID;
+  console.log(msgUsuario);
+  console.log(userID);
+  let respuesta = await dialogflow.sendToDialogFlow(
+    msgUsuario,
+    userID,
+    "Angular"
+  );
+
+  /* Enviamos respuesta en el formato elegido para el proyecto*/
+
+  let mensajeRecibido = {
+    userId: userID,
+    
+    boot: {
+      estado: true,
+        texto: respuesta[0].queryResult.fulfillmentText,
+        voz: respuesta[0].outputAudio,
+        configAudio: respuesta[0].outputAudioConfig,
+        fecha: new Date(),
+        mostrarImagen:false,
+        imagen: '',
+        MasPreguntas: false
+    },
+    user: {
+      estado: false,
+      texto: '',
+      fecha: '',
+    },
+  }
+
+  res.json(mensajeRecibido)
+
+
+}
+
+
+exports.noCalifica = async(req,res) =>{
+
+  let msgUsuario = req.body.text;
+  
+  let userID = req.body.userID;
+  console.log(msgUsuario);
+  console.log(userID);
+  let respuesta = await dialogflow.sendToDialogFlow(
+    msgUsuario,
+    userID,
+    "Angular"
+  );
+
+  /* Enviamos respuesta en el formato elegido para el proyecto*/
+
+  let mensajeRecibido = {
+    userId: userID,
+    
+    boot: {
+      estado: true,
+        texto: respuesta[0].queryResult.fulfillmentText,
+        voz: respuesta[0].outputAudio,
+        configAudio: respuesta[0].outputAudioConfig,
+        fecha: new Date(),
+        mostrarImagen:false,
+        imagen: '',
+        MasPreguntas: false
+    },
+    user: {
+      estado: false,
+      texto: '',
+      fecha: '',
+    },
+  }
+
+  res.json(mensajeRecibido)
+
+
+
+
+}
