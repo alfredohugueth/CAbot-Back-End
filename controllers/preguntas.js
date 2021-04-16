@@ -170,7 +170,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
               fecha: new Date(),
               mostrarImagen:false,
               imagen: '',
-              MasPreguntas: false
+              MasPreguntas: true
           },
           user: {
             estado: true,
