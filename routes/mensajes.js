@@ -27,6 +27,8 @@ router.post('/califica',mensajes.calificacion);
 
 router.post('/nocalifica',mensajes.noCalifica);
 
+router.get('/numero-preguntas',mensajes.NumeroPreguntasConFundamentoRealizadas);
+
 
 
 

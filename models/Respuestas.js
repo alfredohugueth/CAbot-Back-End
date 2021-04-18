@@ -30,6 +30,16 @@ const RespuestasSchema = mongoose.Schema({
             type:Date,
             required:true
         },
+        "fundamento":{
+            type:Boolean,
+            
+        },
+        "mostrarImaneg":{
+            type:Boolean
+        },
+        "imagen":{
+            type:String
+        }
         
     },
     "user":{
@@ -50,7 +60,7 @@ const RespuestasSchema = mongoose.Schema({
 
 });
 
-module.exports = mongoose.model('Respuestas',RespuestasSchema);
+module.exports = mongoose.model('preguntas',RespuestasSchema);
 
 
 

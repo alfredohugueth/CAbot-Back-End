@@ -135,8 +135,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
         //Verificamos que tenga Imagen, caso contrario
         if (payload.image) {
           //Buscamos el fundamento ...
-          let MostrarBotonesMasPreguntas = Boolean(payload.Fundamento.stringValue);
-          console.log("Existe elemento imagen");
+          let fundamento = Boolean(payload.Fundamento.stringValue);
           mensajeRecibido = {
             userId: userID,
             tipoPregunta: '',
@@ -148,7 +147,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
               fecha: new Date(),
               mostrarImagen:true,
               imagen: payload.image.stringValue,
-              MasPreguntas: MostrarBotonesMasPreguntas
+              fundamento: fundamento
             },
             user: {
               estado: true,
@@ -195,25 +194,25 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
       console.log('No hay payload en el mensaje');
       //Ejecuto normalmente la respuesta
       let tipoPregunta = respuesta[0].queryResult.action;
-        mensajeRecibido = {
-          userId: userID,
-          tipoPregunta: tipoPregunta,
-          boot: {
-            estado: true,
-              texto: respuesta[0].queryResult.fulfillmentText,
-              voz: respuesta[0].outputAudio,
-              configAudio: respuesta[0].outputAudioConfig,
-              fecha: new Date(),
-              mostrarImagen:false,
-              imagen: '',
-              MasPreguntas: false
-          },
-          user: {
-            estado: true,
-            texto: respuesta[0].queryResult.queryText,
-            fecha: fecha,
-          },
-        }
+      mensajeRecibido = {
+        userId: userID,
+        tipoPregunta: '',
+        boot:{
+          estado: true,
+          texto: respuesta[0].queryResult.fulfillmentText,
+          voz: respuesta[0].outputAudio,
+          configAudio: respuesta[0].outputAudioConfig,
+          fecha: new Date(),
+          mostrarImagen:false,
+          imagen: '',
+          fundamento: false
+        },
+        user: {
+          estado: true,
+          texto: respuesta[0].queryResult.queryText,
+          fecha: fecha,
+        },
+      }
 
         mensaje = new Respuestas(mensajeRecibido);
     
@@ -261,10 +260,10 @@ exports.PreguntaVozCliente = async (req, res) => {
 exports.PreguntasRepetidasConRespuesta = async (req, res) => {
   await Respuestas.aggregate(
     [
-      {
+      {$match: {"boot.fundamento":true}},
+       {
         $group: {
           _id: {
-            tipo: "$tipoPregunta",
             Pregunta: "$user.texto",
             Respuesta: "$boot.texto",
           },
@@ -274,8 +273,10 @@ exports.PreguntasRepetidasConRespuesta = async (req, res) => {
       {
         $sort: { count: -1 },
       },
+      { $limit:5}
     ],
     function (err, docs) {
+      console.log(docs);
       if (docs.length > 0) {
         res.json(docs);
       } else {
@@ -285,6 +286,11 @@ exports.PreguntasRepetidasConRespuesta = async (req, res) => {
     }
   );
 };
+
+exports.NumeroPreguntasConFundamentoRealizadas = async (req,res)=>{
+  let numeroDePreguntasConFundamento = await Respuestas.countDocuments({"boot.fundamento":true});
+  res.json({numeroPreguntasFundamentos:numeroDePreguntasConFundamento});
+}
 
 
 exports.QuieroPreguntarMas = async (req,res)=>{
