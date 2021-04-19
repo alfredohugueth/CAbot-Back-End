@@ -138,7 +138,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
           let fundamento = Boolean(payload.Fundamento.stringValue);
           mensajeRecibido = {
             userId: userID,
-            tipoPregunta: '',
+            tipoPregunta: respuesta[0].queryResult.intent.displayName,
             boot:{
               estado: true,
               texto: respuesta[0].queryResult.fulfillmentText,
@@ -157,7 +157,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
           };
         }else{
         //console.log(JSON.stringify(respuesta[0].queryResult.fulfillmentMessages));
-        let tipoPregunta = respuesta[0].queryResult.action;
+        let tipoPregunta = respuesta[0].queryResult.intent.displayName;
         mensajeRecibido = {
           userId: userID,
           tipoPregunta: tipoPregunta,
@@ -196,7 +196,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
       let tipoPregunta = respuesta[0].queryResult.action;
       mensajeRecibido = {
         userId: userID,
-        tipoPregunta: '',
+        tipoPregunta: respuesta[0].queryResult.intent.displayName,
         boot:{
           estado: true,
           texto: respuesta[0].queryResult.fulfillmentText,
@@ -264,7 +264,7 @@ exports.PreguntasRepetidasConRespuesta = async (req, res) => {
        {
         $group: {
           _id: {
-            Pregunta: "$user.texto",
+            Pregunta: "$tipoPregunta",
             Respuesta: "$boot.texto",
           },
           count: { $sum: 1 },
