@@ -452,7 +452,7 @@ exports.noCalifica = async(req,res) =>{
 }
 
 
-function sendResponseWithImage(req,res,params,respuesta) {
+async function sendResponseWithImage(req,res,params,respuesta) {
   let mensaje;
   let fundamento = Boolean(params.Fundamento.stringValue);
           mensajeRecibido = {
@@ -488,7 +488,7 @@ function sendResponseWithImage(req,res,params,respuesta) {
   
 }
 
-function  sendResponseWithoutImage(req,res,params,respuesta) {
+async function  sendResponseWithoutImage(req,res,params,respuesta) {
   let tipoPregunta = respuesta[0].queryResult.intent.displayName;
         mensajeRecibido = {
           userId: userID,
