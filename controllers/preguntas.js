@@ -234,27 +234,37 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
 };
 
 exports.PreguntaVozCliente = async (req, res) => {
+  let params = '';
+  let image = '';
   let userID = req.body.id;
   let audioInput = req.files.pregunta.data;
+  try{
   let respuesta = await dialogflow.sendAudioToDialogflow(audioInput, userID);
-  console.log(respuesta);
-  let datosPregunda = respuesta[0].queryResult;
-  let mensajeAudio = {
-    userId: userID,
-    boot: {
-      estado: true,
-      texto: respuesta[0].queryResult.fulfillmentText,
-      voz: respuesta[0].outputAudio,
-      configAudio: respuesta[0].outputAudioConfig,
-      fecha: new Date(),
-    },
-    user: {
-      estado: false,
-      texto: datosPregunda.queryText,
-      fecha: new Date(),
-    },
-  };
-  res.json(mensajeAudio);
+    /* Verificamos que el parametro params exitsta en los fullfilment messages*/
+    if(respuesta[0].queryResult.fulfillmentMessages[1].hasOwnProperty("payload")) mandamosRespuestaConPayload(req,res,respuesta);
+    else{
+        let datosPregunda = respuesta[0].queryResult;
+        let mensajeAudio = {
+          userId: userID,
+          boot: {
+            estado: true,
+            texto: respuesta[0].queryResult.fulfillmentText,
+            voz: respuesta[0].outputAudio,
+            configAudio: respuesta[0].outputAudioConfig,
+            fecha: new Date(),
+          },
+          user: {
+            estado: false,
+            texto: datosPregunda.queryText,
+            fecha: new Date(),
+          },
+        };
+        res.json(mensajeAudio);
+    } 
+  }catch(err){
+    console.log('Hubo un error por parte de dialogflow');
+    /* Funcion de fallo*/
+  }
 };
 
 exports.PreguntasRepetidasConRespuesta = async (req, res) => {
@@ -288,7 +298,7 @@ exports.PreguntasRepetidasConRespuesta = async (req, res) => {
 };
 
 exports.NumeroPreguntasConFundamentoRealizadas = async (req,res)=>{
-  let numeroDePreguntasConFundamento = await Respuestas.countDocuments({"boot.fundamento":true});
+  let numeroDePreguntasConFundamento = await Respuestas.countDocuments();
   res.json({numeroPreguntasFundamentos:numeroDePreguntasConFundamento});
 }
 
@@ -439,4 +449,84 @@ exports.noCalifica = async(req,res) =>{
 
 
 
+}
+
+
+function sendResponseWithImage(req,res,params,respuesta) {
+  let mensaje;
+  let fundamento = Boolean(params.Fundamento.stringValue);
+          mensajeRecibido = {
+            userId: userID,
+            tipoPregunta: respuesta[0].queryResult.intent.displayName,
+            boot:{
+              estado: true,
+              texto: respuesta[0].queryResult.fulfillmentText,
+              voz: respuesta[0].outputAudio,
+              configAudio: respuesta[0].outputAudioConfig,
+              fecha: new Date(),
+              mostrarImagen:true,
+              imagen: params.image.stringValue,
+              fundamento: fundamento
+            },
+            user: {
+              estado: true,
+              texto: respuesta[0].queryResult.queryText,
+              fecha: fecha,
+            },
+          };
+          mensaje = new Respuestas(mensajeRecibido);
+    
+          await mensaje.save();
+      
+          // Cambiamos estado de user.
+          mensajeRecibido.user.estado = false;
+      
+          // Mandamos el mensaje json recibido en el formato establecido por el front de angular
+          res.json(mensajeRecibido);
+          
+
+  
+}
+
+function  sendResponseWithoutImage(req,res,params,respuesta) {
+  let tipoPregunta = respuesta[0].queryResult.intent.displayName;
+        mensajeRecibido = {
+          userId: userID,
+          tipoPregunta: tipoPregunta,
+          boot: {
+            estado: true,
+              texto: respuesta[0].queryResult.fulfillmentText,
+              voz: respuesta[0].outputAudio,
+              configAudio: respuesta[0].outputAudioConfig,
+              fecha: new Date(),
+              mostrarImagen:false,
+              imagen: '',
+              MasPreguntas: true
+          },
+          user: {
+            estado: true,
+            texto: respuesta[0].queryResult.queryText,
+            fecha: fecha,
+          },
+        }
+
+        // Guardamos respuesta completa en la base de datos.
+        mensaje = new Respuestas(mensajeRecibido);
+    
+        await mensaje.save();
+    
+        // Cambiamos estado de user.
+        mensajeRecibido.user.estado = false;
+    
+        // Mandamos el mensaje json recibido en el formato establecido por el front de angular
+        res.json(mensajeRecibido);
+
+
+}
+
+function mandamosRespuestaConPayload(req,res,respuesta) {
+  params = respuesta[0].queryResult.fulfillmentMessages[1].fields.element.structValue.fields
+  /* Una respuesta con Imagen es de fundamento ... */
+  if(params.hasOwnProperty("image")) sendResponseWithImage(req,res,params,respuesta);
+  else sendResponseWithoutImage(req,res,params,respuesta);
 }
