@@ -241,27 +241,30 @@ exports.PreguntaVozCliente = async (req, res) => {
   try{
   let respuesta = await dialogflow.sendAudioToDialogflow(audioInput, userID);
     /* Verificamos que el parametro params exitsta en los fullfilment messages*/
-    if(respuesta[0].queryResult.fulfillmentMessages[1].hasOwnProperty("payload")) mandamosRespuestaConPayload(req,res,respuesta);
-    else{
-        let datosPregunda = respuesta[0].queryResult;
-        let mensajeAudio = {
-          userId: userID,
-          boot: {
-            estado: true,
-            texto: respuesta[0].queryResult.fulfillmentText,
-            voz: respuesta[0].outputAudio,
-            configAudio: respuesta[0].outputAudioConfig,
-            fecha: new Date(),
-          },
-          user: {
-            estado: false,
-            texto: datosPregunda.queryText,
-            fecha: new Date(),
-          },
-        };
-        res.json(mensajeAudio);
-    } 
+    if(respuesta[0].queryResult.fulfillmentMessages.length >1){
+    if(respuesta[0].queryResult.fulfillmentMessages[1].hasOwnProperty("payload")) mandamosRespuestaConPayload(req,res,respuesta,userID);
+    
+  }else{
+    let datosPregunda = respuesta[0].queryResult;
+    let mensajeAudio = {
+      userId: userID,
+      boot: {
+        estado: true,
+        texto: respuesta[0].queryResult.fulfillmentText,
+        voz: respuesta[0].outputAudio,
+        configAudio: respuesta[0].outputAudioConfig,
+        fecha: new Date(),
+      },
+      user: {
+        estado: false,
+        texto: datosPregunda.queryText,
+        fecha: new Date(),
+      },
+    };
+    res.json(mensajeAudio);
+} 
   }catch(err){
+    console.log(err);
     console.log('Hubo un error por parte de dialogflow');
     /* Funcion de fallo*/
   }
@@ -452,7 +455,7 @@ exports.noCalifica = async(req,res) =>{
 }
 
 
-async function sendResponseWithImage(req,res,params,respuesta) {
+async function sendResponseWithImage(req,res,params,respuesta,userID) {
   let mensaje;
   let fundamento = Boolean(params.Fundamento.stringValue);
           mensajeRecibido = {
@@ -471,7 +474,7 @@ async function sendResponseWithImage(req,res,params,respuesta) {
             user: {
               estado: true,
               texto: respuesta[0].queryResult.queryText,
-              fecha: fecha,
+              fecha: new Date(),
             },
           };
           mensaje = new Respuestas(mensajeRecibido);
@@ -488,7 +491,7 @@ async function sendResponseWithImage(req,res,params,respuesta) {
   
 }
 
-async function  sendResponseWithoutImage(req,res,params,respuesta) {
+async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
   let tipoPregunta = respuesta[0].queryResult.intent.displayName;
         mensajeRecibido = {
           userId: userID,
@@ -506,7 +509,7 @@ async function  sendResponseWithoutImage(req,res,params,respuesta) {
           user: {
             estado: true,
             texto: respuesta[0].queryResult.queryText,
-            fecha: fecha,
+            fecha: new Date(),
           },
         }
 
@@ -524,9 +527,12 @@ async function  sendResponseWithoutImage(req,res,params,respuesta) {
 
 }
 
-function mandamosRespuestaConPayload(req,res,respuesta) {
-  params = respuesta[0].queryResult.fulfillmentMessages[1].fields.element.structValue.fields
+function mandamosRespuestaConPayload(req,res,respuesta,userID) {
+  console.log(respuesta[0].queryResult.fulfillmentMessages)
+  let params = respuesta[0].queryResult.fulfillmentMessages[1].payload.fields.element.structValue.fields;
+  console.log(params);
+      
   /* Una respuesta con Imagen es de fundamento ... */
-  if(params.hasOwnProperty("image")) sendResponseWithImage(req,res,params,respuesta);
-  else sendResponseWithoutImage(req,res,params,respuesta);
+  if(params.hasOwnProperty("image")) sendResponseWithImage(req,res,params,respuesta,userID);
+  else sendResponseWithoutImage(req,res,params,respuesta,userID);
 }
