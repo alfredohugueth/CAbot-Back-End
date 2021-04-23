@@ -39,6 +39,9 @@ const RespuestasSchema = mongoose.Schema({
         },
         "imagen":{
             type:String
+        },
+        "referencia":{
+            type:String
         }
         
     },

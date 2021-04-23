@@ -86,19 +86,26 @@ exports.RevisaMensajesAnterioresConID = async (req, res) => {
   }
 };
 
-exports.mensajeBienvenidaUsuario = (req, res) => {
+exports.mensajeBienvenidaUsuario = async (req, res) => {
   // Consultamos a la base de datos si el usuario ha hablado con el bot con anterioridad.
 
   console.log(
     "Ingreso nuevo usuario a la pagina, enviar primer mensaje del bot."
   );
-  let msgBienve =
-    "Hola nuevo usuario, mi nombre es CAbot tu asistente de control automatico";
+  let mensajeBienvenida = "intent definido para recibir al usuario"
+  console.log(req.body);
+  let userID = req.body.id;
+  console.log(userID);
+  let respuesta = await dialogflow.sendToDialogFlow(mensajeBienvenida,userID);
+  let msgBienve = respuesta[0].queryResult.fulfillmentText
   let msgEnviado = {
     boot: {
       estado: true,
       texto: msgBienve,
       fecha: new Date(),
+      voz: respuesta[0].outputAudio,
+      configAudio: respuesta[0].outputAudioConfig,
+              
     },
     user: {
       estado: false,
@@ -147,7 +154,8 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
               fecha: new Date(),
               mostrarImagen:true,
               imagen: payload.image.stringValue,
-              fundamento: fundamento
+              fundamento: fundamento,
+              referencia:payload.Fuente.stringValue
             },
             user: {
               estado: true,
@@ -158,6 +166,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
         }else{
         //console.log(JSON.stringify(respuesta[0].queryResult.fulfillmentMessages));
         let tipoPregunta = respuesta[0].queryResult.intent.displayName;
+        let fundamento = Boolean(payload.Fundamento.stringValue);
         mensajeRecibido = {
           userId: userID,
           tipoPregunta: tipoPregunta,
@@ -169,7 +178,8 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
               fecha: new Date(),
               mostrarImagen:false,
               imagen: '',
-              MasPreguntas: true
+              fundamento: fundamento,
+              referencia:payload.Fuente.stringValue
           },
           user: {
             estado: true,
@@ -469,7 +479,8 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
               fecha: new Date(),
               mostrarImagen:true,
               imagen: params.image.stringValue,
-              fundamento: fundamento
+              fundamento: fundamento,
+              referencia:params.Fuente.stringValue
             },
             user: {
               estado: true,
@@ -493,6 +504,7 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
 
 async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
   let tipoPregunta = respuesta[0].queryResult.intent.displayName;
+  let fundamento = Boolean(params.Fundamento.stringValue);
         mensajeRecibido = {
           userId: userID,
           tipoPregunta: tipoPregunta,
@@ -504,7 +516,8 @@ async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
               fecha: new Date(),
               mostrarImagen:false,
               imagen: '',
-              MasPreguntas: true
+              fundamento:fundamento,
+              referencia:params.Fuente.stringValue
           },
           user: {
             estado: true,
@@ -528,7 +541,6 @@ async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
 }
 
 function mandamosRespuestaConPayload(req,res,respuesta,userID) {
-  console.log(respuesta[0].queryResult.fulfillmentMessages)
   let params = respuesta[0].queryResult.fulfillmentMessages[1].payload.fields.element.structValue.fields;
   console.log(params);
       

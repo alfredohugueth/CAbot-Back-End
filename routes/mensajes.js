@@ -9,7 +9,7 @@ const mensajes = require('../controllers/preguntas');
 // Ruta para /botmsg
 
 // Primer mensaje del servidor.
-router.get('/',mensajes.mensajeBienvenidaUsuario);
+router.post('/',mensajes.mensajeBienvenidaUsuario);
 
 router.post('/usuario',mensajes.PreguntaTextoDeCliente);
 
