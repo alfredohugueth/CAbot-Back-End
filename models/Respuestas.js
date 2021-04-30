@@ -42,6 +42,9 @@ const RespuestasSchema = mongoose.Schema({
         },
         "referencia":{
             type:String
+        },
+        "videos":{
+            type:Array
         }
         
     },

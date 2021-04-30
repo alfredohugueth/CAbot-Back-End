@@ -138,10 +138,16 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
      payload =
       respuesta[0].queryResult.fulfillmentMessages[1].payload.fields.element
         .structValue.fields;
-        console.log(payload);
+        // console.log(payload);
+        console.log(payload.urls.listValue.values[0].structValue.fields)
+        /* Necesito aplicar un metodo for para todos los valores dentro del array */
+
         //Verificamos que tenga Imagen, caso contrario
         if (payload.image) {
           //Buscamos el fundamento ...
+          /* Si tiene imagen, tiene fundamento */
+          let urls_Titulos = buscarUrls(payload.urls.listValue.values);
+          console.log(urls_Titulos);
           let fundamento = Boolean(payload.Fundamento.stringValue);
           mensajeRecibido = {
             userId: userID,
@@ -155,7 +161,8 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
               mostrarImagen:true,
               imagen: payload.image.stringValue,
               fundamento: fundamento,
-              referencia:payload.Fuente.stringValue
+              referencia:payload.Fuente.stringValue,
+              videos:urls_Titulos
             },
             user: {
               estado: true,
@@ -167,6 +174,8 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
         //console.log(JSON.stringify(respuesta[0].queryResult.fulfillmentMessages));
         let tipoPregunta = respuesta[0].queryResult.intent.displayName;
         let fundamento = Boolean(payload.Fundamento.stringValue);
+        let urls_Titulos = buscarUrls(payload.urls.listValue.values);
+        console.log(urls_Titulos)
         mensajeRecibido = {
           userId: userID,
           tipoPregunta: tipoPregunta,
@@ -179,7 +188,8 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
               mostrarImagen:false,
               imagen: '',
               fundamento: fundamento,
-              referencia:payload.Fuente.stringValue
+              referencia:payload.Fuente.stringValue,
+              videos:urls_Titulos
           },
           user: {
             estado: true,
@@ -289,6 +299,7 @@ exports.PreguntasRepetidasConRespuesta = async (req, res) => {
           _id: {
             Pregunta: "$tipoPregunta",
             Respuesta: "$boot.texto",
+            videos: "$boot.videos"
           },
           count: { $sum: 1 },
         },
@@ -464,10 +475,20 @@ exports.noCalifica = async(req,res) =>{
 
 }
 
+function buscarUrls(objUrls) {
+  let urls=[];
+  for(let object of objUrls){
+      console.log(object);
+      urls.push(object.structValue.fields)
+  }
+  return urls
+}
+
 
 async function sendResponseWithImage(req,res,params,respuesta,userID) {
   let mensaje;
   let fundamento = Boolean(params.Fundamento.stringValue);
+  let urls_Titulos = buscarUrls(params.urls.listValue.values);
           mensajeRecibido = {
             userId: userID,
             tipoPregunta: respuesta[0].queryResult.intent.displayName,
@@ -480,7 +501,8 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
               mostrarImagen:true,
               imagen: params.image.stringValue,
               fundamento: fundamento,
-              referencia:params.Fuente.stringValue
+              referencia:params.Fuente.stringValue,
+              videos:urls_Titulos
             },
             user: {
               estado: true,
@@ -505,6 +527,7 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
 async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
   let tipoPregunta = respuesta[0].queryResult.intent.displayName;
   let fundamento = Boolean(params.Fundamento.stringValue);
+  let urls_Titulos = buscarUrls(params.urls.listValue.values);
         mensajeRecibido = {
           userId: userID,
           tipoPregunta: tipoPregunta,
@@ -517,7 +540,8 @@ async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
               mostrarImagen:false,
               imagen: '',
               fundamento:fundamento,
-              referencia:params.Fuente.stringValue
+              referencia:params.Fuente.stringValue,
+              videos:urls_Titulos
           },
           user: {
             estado: true,
