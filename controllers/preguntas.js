@@ -211,6 +211,7 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
         res.json(mensajeRecibido);
         
     }catch(err){
+      console.log(err);
       console.log('No hay payload en el mensaje');
       //Ejecuto normalmente la respuesta
       let tipoPregunta = respuesta[0].queryResult.action;
@@ -476,10 +477,14 @@ exports.noCalifica = async(req,res) =>{
 }
 
 function buscarUrls(objUrls) {
+  console.log(objUrls);
   let urls=[];
   for(let object of objUrls){
       console.log(object);
-      urls.push(object.structValue.fields)
+      urls.push({
+        url: object.structValue.fields.url.stringValue,
+        titulo: object.structValue.fields.titulo.stringValue
+      })
   }
   return urls
 }
@@ -489,7 +494,7 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
   let mensaje;
   let fundamento = Boolean(params.Fundamento.stringValue);
   let urls_Titulos = buscarUrls(params.urls.listValue.values);
-          mensajeRecibido = {
+  let mensajeRecibido = {
             userId: userID,
             tipoPregunta: respuesta[0].queryResult.intent.displayName,
             boot:{
@@ -511,7 +516,6 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
             },
           };
           mensaje = new Respuestas(mensajeRecibido);
-    
           await mensaje.save();
       
           // Cambiamos estado de user.
