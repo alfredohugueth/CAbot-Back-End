@@ -135,11 +135,11 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
     console.log('Hasta aca bien');
     let payload;
     try{
+      console.log('entro a try catch');
      payload =
       respuesta[0].queryResult.fulfillmentMessages[1].payload.fields.element
         .structValue.fields;
         // console.log(payload);
-        console.log(payload.urls.listValue.values[0].structValue.fields)
         /* Necesito aplicar un metodo for para todos los valores dentro del array */
 
         //Verificamos que tenga Imagen, caso contrario
@@ -172,9 +172,12 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
           };
         }else{
         //console.log(JSON.stringify(respuesta[0].queryResult.fulfillmentMessages));
+        console.log('entro al else');
+        console.log(payload);
+        let urls_Titulos = []
         let tipoPregunta = respuesta[0].queryResult.intent.displayName;
         let fundamento = Boolean(payload.Fundamento.stringValue);
-        let urls_Titulos = buscarUrls(payload.urls.listValue.values);
+        if( payload.urls ) urls_Titulos = buscarUrls(payload.urls.listValue.values);
         console.log(urls_Titulos)
         mensajeRecibido = {
           userId: userID,
@@ -531,7 +534,9 @@ async function sendResponseWithImage(req,res,params,respuesta,userID) {
 async function  sendResponseWithoutImage(req,res,params,respuesta,userID) {
   let tipoPregunta = respuesta[0].queryResult.intent.displayName;
   let fundamento = Boolean(params.Fundamento.stringValue);
-  let urls_Titulos = buscarUrls(params.urls.listValue.values);
+  let urls_Titulos = [];
+  if( params.urls ) urls_Titulos = buscarUrls(params.urls.listValue.values);
+   
         mensajeRecibido = {
           userId: userID,
           tipoPregunta: tipoPregunta,
