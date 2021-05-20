@@ -146,7 +146,10 @@ exports.PreguntaTextoDeCliente = async (req, res) => {
         if (payload.image) {
           //Buscamos el fundamento ...
           /* Si tiene imagen, tiene fundamento */
-          let urls_Titulos = buscarUrls(payload.urls.listValue.values);
+          let urls_Titulos = [];
+          if(payload.urls) {
+          urls_Titulos = buscarUrls(payload.urls.listValue.values);
+          } 
           console.log(urls_Titulos);
           let fundamento = Boolean(payload.Fundamento.stringValue);
           mensajeRecibido = {
@@ -496,7 +499,10 @@ function buscarUrls(objUrls) {
 async function sendResponseWithImage(req,res,params,respuesta,userID) {
   let mensaje;
   let fundamento = Boolean(params.Fundamento.stringValue);
-  let urls_Titulos = buscarUrls(params.urls.listValue.values);
+  let urls_Titulos = [];
+  if(params.urls) {
+    urls_Titulos = buscarUrls(params.urls.listValue.values);
+  } 
   let mensajeRecibido = {
             userId: userID,
             tipoPregunta: respuesta[0].queryResult.intent.displayName,

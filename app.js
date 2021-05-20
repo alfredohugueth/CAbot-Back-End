@@ -11,7 +11,6 @@ const conectarDB = require('./routes/database');
 
 
 var indexRouter = require('./routes/index');
-var questionRouter = require('./routes/preguntasFrecuentes');
 var AngularMsgs = require('./routes/mensajes');
 
 var app = express();
@@ -39,7 +38,6 @@ conectarDB();
 app.use('/', indexRouter);
 
 app.use('/botmsg',AngularMsgs);
-app.use('/preguntas', questionRouter);
 
 app.use(
   bodyParser.json({
