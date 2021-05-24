@@ -11,8 +11,8 @@
 
 <img alt="JavaScript" width="40" height="40" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/javascript/javascript.png">
 <img alt="JavaScript" width="40" height="40" src="https://www.vectorlogo.zone/logos/nodejs/nodejs-icon.svg">
-<img alt="JavaScript" width="40" height="40" src="https://www.vectorlogo.zone/logos/expressjs/expressjs-ar21.svg">
-<img alt="JavaScript" width="40" height="40" src="https://www.vectorlogo.zone/logos/mongodb/mongodb-ar21.svg">
+<img alt="JavaScript" width="40" height="40" src="https://www.vectorlogo.zone/logos/expressjs/expressjs-icon.svg">
+<img alt="JavaScript" width="40" height="40" src="https://www.vectorlogo.zone/logos/mongodb/mongodb-icon.svg">
 
 </p>
 
